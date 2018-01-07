@@ -145,18 +145,7 @@ public class MyFrame extends JFrame {
 		gbc.weightx = 0;
 		gbc.weighty = 1;
 		gbl.setConstraints(jp2, gbc);//设置组件:JPanel2，包含下拉菜单，机器人列表，Meldung显示区域
-		
-/*		
-		gbc.gridwidth = 2;
-		gbc.weightx = 0;
-		gbc.weighty = 1;
-		gbl.setConstraints(jcb1, gbc);//设置组件:下拉菜单，包含3种比赛方式
-*/		
-/*		gbc.gridwidth = 1;
-		gbc.weightx = 0;
-		gbc.weighty = 1;
-		gbl.setConstraints(jlist, gbc);//设置组件:列表，显示机器人编号
-*/		
+				
 		gbc.gridwidth = 0;
 		gbc.weightx = 0;
 		gbc.weighty = 0;
