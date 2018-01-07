@@ -18,8 +18,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 public class MyFrame extends JFrame {
-	private JButton jb1, jb2, jb3;
-	private JPanel jp1, jp2;
+	private JButton jb1, jb2, jb3, jb4, jb5;
+	private JPanel jp1, jp2, jp3;
 	private JComboBox<String> jcb1;
 	private JLabel jlb1, jlb2, jlb3, jlb4, jlb5, jlb6, jlb7;
 	private JTextField jtf1, jtf2, jtf3, jtf4, jtf5;
@@ -75,10 +75,16 @@ public class MyFrame extends JFrame {
 		jta.setBorder(BorderFactory.createTitledBorder("Meldungen"));
 		jta.setBackground(Color.WHITE);
 		
-		jlb_map = new JLabel();
+		jp3 = new JPanel();		// 包含jlb_map, jb4, jb5
+		jp3.setBackground(getBackground());
+		jp3.setLayout(new BorderLayout());
+		
+		jlb_map = new JLabel();		//绘图mapping
 		jlb_map.setBorder(BorderFactory.createTitledBorder("Mapping"));
 		jlb_map.setBackground(Color.WHITE);
 		
+		jb4 = new JButton("Generate Map");
+		jb5 = new JButton("Save Map");
 		
 		GridBagLayout gbl = new GridBagLayout();
 		this.setLayout(gbl);
@@ -103,7 +109,13 @@ public class MyFrame extends JFrame {
 		jp2.add(jlist,BorderLayout.CENTER);
 		jta.setPreferredSize(new Dimension(0,200));
 		jp2.add(jta,BorderLayout.SOUTH);
-		this.add(jlb_map);
+		this.add(jp3);
+		jp3.add(jlb_map,BorderLayout.NORTH);
+		jlb_map.setPreferredSize(new Dimension(0,450));
+		jp3.add(jb4,BorderLayout.CENTER);
+		jb4.setPreferredSize(new Dimension(0,45));
+		jp3.add(jb5,BorderLayout.SOUTH);
+		jb5.setPreferredSize(new Dimension(0,45));
 		
 		
 		GridBagConstraints gbc = new GridBagConstraints();	// Attributesmanager
@@ -117,7 +129,7 @@ public class MyFrame extends JFrame {
 		gbc.gridwidth = 1;
 		gbc.weightx = 0;
 		gbc.weighty = 0;
-		gbl.setConstraints(jb2, gbc);//设置组件:按钮Set
+		gbl.setConstraints(jb2, gbc);//设置组件:按钮Start
 		
 		gbc.gridwidth = 1;
 		gbc.weightx = 0;
@@ -132,7 +144,7 @@ public class MyFrame extends JFrame {
 		gbc.gridwidth = 4;
 		gbc.weightx = 0;
 		gbc.weighty = 1;
-		gbl.setConstraints(jp2, gbc);//设置组件:JPanel2，包含下拉菜单和列表
+		gbl.setConstraints(jp2, gbc);//设置组件:JPanel2，包含下拉菜单，机器人列表，Meldung显示区域
 		
 /*		
 		gbc.gridwidth = 2;
@@ -145,10 +157,11 @@ public class MyFrame extends JFrame {
 		gbc.weighty = 1;
 		gbl.setConstraints(jlist, gbc);//设置组件:列表，显示机器人编号
 */		
-		gbc.gridwidth = 5;
-		gbc.weightx = 1;
-		gbc.weighty = 1;
-		gbl.setConstraints(jlb_map, gbc);//设置组件:JTextArea,用于绘制实时地图
+		gbc.gridwidth = 0;
+		gbc.weightx = 0;
+		gbc.weighty = 0;
+		gbl.setConstraints(jp3, gbc);//设置组件:JTextArea,用于绘制实时地图
+		
 		
 	}
 
