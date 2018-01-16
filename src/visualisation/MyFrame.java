@@ -19,8 +19,13 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
+
 
 public class MyFrame extends JFrame {
 	// variables for window construction
@@ -31,65 +36,71 @@ public class MyFrame extends JFrame {
 	private JTextField jtf1, jtf2, jtf3, jtf4, jtf5, jtf6, jtf7, jtf8, jtf9, jtf10;
 	private JList jlist;
 	private JTextArea jta;
+	private JScrollPane jsp;
 	private JLabel jlb_map;
 	
 	// variables for ActionListener of Buttons
 	private int startX, startY, destX, destY;
+	private int robotAngle, opponentRobotAngle;
 	
-	
+	// main method
 	public static void main(String[] args) {
 		MyFrame mf = new MyFrame();
 	}
 	
-	public MyFrame() {
-		// TODO Auto-generated constructor stub
+	public MyFrame() {		// Constructur
 		init();
 		this.setTitle("MyFrame");
 		this.setSize(1290, 600);
-//		this.setResizable(false);
+		this.setResizable(false);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		this.addWindowListener(new MyWindowListener());
 		this.setVisible(true);
 	}
 	
 	public void init() {
 		jb1 = new JButton("Connect/Diconnect");
+		jb1.addActionListener(new ALButtons(this));	// ActionListener for jb1
 		jb2 = new JButton("Start");
+		jb2.addActionListener(new ALButtons(this));	// ActionListener for jb2
 		jb3 = new JButton("Reset");
+		jb3.addActionListener(new ALButtons(this));	// ActionListener for jb3
+		
 		
 		jp1 = new JPanel();	// includes "Start Point","x: ","y: ","Angle: ","Destination","x: ","y: ".
 		jlb1 = new JLabel("Start Point");
 		jlb2 = new JLabel("x:");		
 		jlb3 = new JLabel("y:");
 		jlb4 = new JLabel("Angle:");
-		jtf1 = new JTextField(4);
-		jtf2 = new JTextField(4);
-		jtf3 = new JTextField(4);
+		jtf1 = new JTextField(4);	// "x: " of own robot
+		jtf2 = new JTextField(4);	// "y: " of own robot
+		jtf3 = new JTextField(4);	// "Angle: " angle of own robot
 		jlb5 = new JLabel("Destination");
 		jlb6 = new JLabel("x:");		
 		jlb7 = new JLabel("y:");
-		jtf4 = new JTextField(4);
-		jtf5 = new JTextField(4);
+		jtf4 = new JTextField(4);	// "x: " of destination
+		jtf5 = new JTextField(4);	// "y: " of destination
 		jlb8 = new JLabel("OpponentRobot");
 		jlb9 = new JLabel("x: ");
-		jtf6 = new JTextField(4);
-		jlb10 = new JLabel("y: ");
-		jtf7 = new JTextField(4);
+		jtf6 = new JTextField(4);	// "x: " of opponent robot
+		jlb10 = new JLabel("y: ");	
+		jtf7 = new JTextField(4);	// "y: " of opponent robot
 		jlb11 = new JLabel("Angle: ");
-		jtf8 = new JTextField(4);
+		jtf8 = new JTextField(4);	// "Angle: " angle of opponent robot
 		
 		
-		jp2 = new JPanel();	// includes "Options", "Robotnumber" and "Information"
+		jp2 = new JPanel();	// includes "Type of competition", "Robotnumber" and "Information"
 		jp2.setBorder(BorderFactory.createTitledBorder("Options"));
 		jp2.setBackground(getBackground());
 		jp2.setLayout(new BorderLayout());
 		String[] str = { "Zeitrennen", "Wegerennen", "Konterrennen" };
-		jcb1 = new JComboBox<>(str);	// 下拉菜单
+		jcb1 = new JComboBox<String>(str);	// 下拉菜单(ComboBox)
+		jcb1.addActionListener(new AL());	// ActionListener for jcb1
 		jcb1.setBorder(BorderFactory.createTitledBorder("Type of Compitition"));
 		
 		
 		String[] robotnumber = {"Robot1","Robot2","Robot3"};
 		jlist = new JList(robotnumber); 
+		jlist.addListSelectionListener(selectRobotNumber);	// ListSelectionListener for jlist(with Robot1, Robot2, Robot3")
 		jlist.setBorder(BorderFactory.createTitledBorder("Robotnumber"));
 		jlist.setBackground(Color.WHITE);
 		
@@ -97,19 +108,23 @@ public class MyFrame extends JFrame {
 		jta.setBorder(BorderFactory.createTitledBorder("Information"));
 		jta.setBackground(Color.WHITE);
 		
-		jp3 = new JPanel();		// 包含jlb_map, jb4, jb5
+		jsp = new JScrollPane(jta);	// jta("Information")中的滚动条
+		
+		jp3 = new JPanel();		// includes jlb_map, jb4, jb5
 		jp3.setBackground(getBackground());
 		jp3.setLayout(new BorderLayout());
 		
-		jlb_map = new JLabel();		//绘图mapping
-		jlb_map.setBorder(BorderFactory.createTitledBorder("Map Settings"));
+		jlb_map = new JLabel();		// JLabel jlp_map
+		jlb_map.setBorder(BorderFactory.createTitledBorder("Preview"));
 		jlb_map.setBackground(Color.WHITE);
 		
 		
 		
 		jb4 = new JButton("Import Map");
+		jb4.addActionListener(new ALButtons(this));	// ActionListener for jb4
 		jtf9 = new JTextField(6);
 		jb5 = new JButton("Save Map");
+		jb5.addActionListener(new ALButtons(this));	// ActionListener for jb5
 		jtf10 = new JTextField(6);
 		
 		GridBagLayout gbl = new GridBagLayout();  // GridBagLayout gbl
@@ -143,8 +158,8 @@ public class MyFrame extends JFrame {
 		this.add(jp2);
 		jp2.add(jcb1,BorderLayout.NORTH);
 		jp2.add(jlist,BorderLayout.CENTER);
-		jta.setPreferredSize(new Dimension(0,200));
-		jp2.add(jta,BorderLayout.SOUTH);
+		jsp.setPreferredSize(new Dimension(0,200));
+		jp2.add(jsp,BorderLayout.SOUTH);
 		// jp3
 		this.add(jp3);
 		GridBagLayout gbl_jp3 = new GridBagLayout();  // GridBagLayout gbl_jp3
@@ -192,7 +207,6 @@ public class MyFrame extends JFrame {
 		
 		
 		
-		
 		GridBagConstraints gbc = new GridBagConstraints();	// GridBagConstraints(Attributesmanager) gbc
 		gbc.fill = GridBagConstraints.BOTH;		// 设置如果组件所在的区域比组件本身要大,使组件完全填满其显示区域
 		
@@ -229,52 +243,75 @@ public class MyFrame extends JFrame {
 		
 	}
 
-	private class MyWindowListener extends WindowAdapter {	// 窗口监听器，监听窗口事件
-
-		@Override
-		public void windowOpened(WindowEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void windowClosing(WindowEvent e) {
-			// TODO Auto-generated method stub
-			System.exit(0);
-			System.out.println("Window is closing.");
-		}
-
-		@Override
-		public void windowClosed(WindowEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void windowIconified(WindowEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void windowDeiconified(WindowEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void windowActivated(WindowEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void windowDeactivated(WindowEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
-		
+	
+	public int getStartX()
+	{
+		return startX;
 	}
+	
+	public int getStartY()
+	{
+		return startY;
+	}
+	
+	public int getRobotAngle()
+	{
+		return robotAngle;
+	}
+	
+	public int getDestX()
+	{
+		return destX;
+	}
+	
+	public int getDestY()
+	{
+		return destY;
+	}
+	
+	public int getOpponentRobotAngle()
+	{
+		return opponentRobotAngle;
+	}
+	
+	public void setStartX(int startX)
+	{
+		this.startX = startX;
+	}
+	
+	public void setStartY(int startY)
+	{
+		this.startY = startY;
+	}
+	
+	public void setRobotAngle(int robotAngle)
+	{
+		this.robotAngle = robotAngle;
+	}
+	
+	public void setDestX(int destX)
+	{
+		this.destX = destX;
+	}
+	
+	public void setDestY(int destY)
+	{
+		this.destY = destY;
+	}
+	
+	public void setOpponentRobotAngle(int opponentRobotAngle)
+	{
+		this.opponentRobotAngle = opponentRobotAngle;
+	}
+	
+	
+	private class SelecTry implements ListSelectionListener {		// for JTextField
+		public void valueChanged(ListSelectionEvent e){
+			
+		}
+	}
+	private SelecTry selectRobotNumber = new SelecTry();
+	
 	
 	private class ALButtons implements ActionListener {
 		private MyFrame mf;
@@ -285,31 +322,52 @@ public class MyFrame extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent buttonevent) {
-			// TODO Auto-generated method stub
+			boolean readyToConnect = false;
 			if(buttonevent.getSource() == jb1)	// If jb1(Connect/Disconnect) is pressed
 			{
-				boolean readToConnect = true;
-				startX = 0;	// set startX to 0 and read new values out of xStartPoint
-				startY = 0;
+//				if()
+				readyToConnect = true;
+				startX = mf.getStartX();	// set startX to 0 and read new values out of xStartPoint
+				startY = mf.getStartY();
+				robotAngle = mf.getRobotAngle();
 				
-				{	// check if x, y and angle Textfields are filled correctly
-					try {
-						startX = Integer.parseInt(jtf1.getText());
-					} catch (NumberFormatException nfe) {
-						readToConnect = false;
-					}
-					try {
-						startY = Integer.parseInt(jtf2.getText());
-					} catch (NumberFormatException nfe) {
-						readToConnect = false;
-					}
-				}
-				
-				if(readToConnect)	// If all Textfields are filled correctly
-				{
-					
-				}
 			}
+			
+			else if(buttonevent.getSource() == jb2)	// If jb2(Start) is pressed
+			{
+				boolean readyToStart = true;
+				destX = mf.getDestX();
+				destY = mf.getDestY();
+				
+			}
+			
+			else if(buttonevent.getSource() == jb3)	// If jb3(Reset) is pressed
+			{
+				
+			}
+			
+			else if(buttonevent.getSource() == jb4)	// If jb4(Import Map) is pressed
+			{
+				
+			}
+			
+			else if(buttonevent.getSource() == jb5)	// If jb5(Save Map) is pressed
+			{
+				
+			}
+			
+		}
+		
+	}
+	
+	
+	
+	private class AL implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			
 		}
 		
 	}
